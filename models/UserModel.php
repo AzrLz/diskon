@@ -9,6 +9,19 @@ class UserModel {
         $this->conn = $conn;
     }
 
+    public function getAllUser() {
+        $query = $this->conn->prepare("SELECT * FROM user");
+        $query->execute();
+        result = $query->get_result();
+
+        $user = [];
+        while ($row = $result->fetch_assoc()){
+            $user[] = $row;
+        }
+
+        return $user;
+    }
+
     public function getUserByEmail($email) {
         $query = $this->conn->prepare("SELECT * FROM user WHERE email = ?");
         $query->bind_param("s", $email);
