@@ -2,17 +2,14 @@
 session_start();
 require_once '../config/database.php';
 
-// Inisialisasi koneksi database
 $koneksi = new Koneksi();
 $conn = $koneksi->getConnection();
 
-// Cek apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
-// Ambil data user
 $user_id = $_SESSION['user_id'];
 $query = $conn->prepare("SELECT * FROM user WHERE id = ?");
 $query->bind_param("i", $user_id);
@@ -20,7 +17,6 @@ $query->execute();
 $result = $query->get_result();
 $user = $result->fetch_assoc();
 
-// Ambil role dari session
 $user_role = $_SESSION['role'] ?? 'user';
 ?>
 
