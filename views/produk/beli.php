@@ -3,7 +3,6 @@ session_start();
 require_once '../../config/database.php';
 require_once '../../models/ProdukModel.php';
 
-// Cek apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit;
@@ -11,11 +10,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Inisialisasi koneksi database
 $koneksi = new Koneksi();
 $conn = $koneksi->getConnection();
 
-// Cek apakah ada produk yang dipilih
 if (!isset($_GET['id'])) {
     header("Location: ../produk.php");
     exit;
@@ -23,7 +20,6 @@ if (!isset($_GET['id'])) {
 
 $id_produk = $_GET['id'];
 
-// Ambil data produk
 $produkModel = new ProdukModel($conn);
 $produk = $produkModel->getProdukById($id_produk);
 
@@ -32,34 +28,29 @@ if (!$produk) {
     exit;
 }
 
-// Proses pembelian saat form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $jumlah_beli = (int) $_POST['jumlah'];
-    
-    // Pastikan stok mencukupi
+
     if ($jumlah_beli > $produk['stok']) {
         header("Location: beli.php?id=$id_produk&status=error&message=Stok tidak mencukupi!");
         exit;
     }
 
-    // Hitung harga setelah diskon
     $diskon = $produk['diskon'];
     $harga_setelah_diskon = $produk['harga'] - ($produk['harga'] * ($diskon / 100));
     $total_harga = $jumlah_beli * $harga_setelah_diskon;
     $tanggal_transaksi = date('Y-m-d H:i:s');
 
-    // Simpan transaksi
     $query = "INSERT INTO transaksi (user_id, produk_id, jumlah, total_harga, diskon, total_harga_setelah_diskon, tanggal_transaksi) 
               VALUES (?, ?, ?, ?, ?, ?, ?)";
     $harga_total = $produk['harga'];
-    $jumlah_beli; // Simpan dalam variabel
+    $jumlah_beli; 
     $stmt = $conn->prepare($query);
     $stmt->bind_param("iiiddds", $user_id, $id_produk, $jumlah_beli, $harga_total, $diskon, $total_harga, $tanggal_transaksi);
     if ($stmt->execute()) {
-        // Kurangi stok produk
+
         $produkModel->kurangiStok($id_produk, $jumlah_beli);
 
-        // Redirect dengan notifikasi sukses
         header("Location: ../produk.php?status=success&message=Pembelian berhasil!");
     } else {
         header("Location: beli.php?id=$id_produk&status=error&message=Terjadi kesalahan!");
