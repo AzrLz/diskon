@@ -5,7 +5,7 @@ class UserModel {
     private $conn;
 
     public function __construct() {
-        global $conn; // Ambil koneksi dari database.php
+        global $conn; 
         $this->conn = $conn;
     }
 
