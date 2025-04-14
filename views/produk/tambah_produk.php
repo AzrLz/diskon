@@ -3,13 +3,11 @@ session_start();
 require_once '../../config/database.php';
 require_once '../../models/ProdukModel.php';
 
-// Pastikan hanya admin yang bisa mengakses
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../produk.php");
     exit;
 }
 
-// Inisialisasi koneksi database
 $koneksi = new Koneksi();
 $conn = $koneksi->getConnection();
 ?>
