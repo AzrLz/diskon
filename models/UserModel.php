@@ -12,7 +12,7 @@ class UserModel {
     public function getAllUser() {
         $query = $this->conn->prepare("SELECT * FROM user");
         $query->execute();
-        result = $query->get_result();
+        $result = $query->get_result();
 
         $user = [];
         while ($row = $result->fetch_assoc()){
